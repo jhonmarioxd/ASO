@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asociación Campesina Rural Renacer - Portal Corporativo</title>
@@ -219,22 +220,22 @@
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-        // CONFIGURACIÓN DE TU INFRAESTRUCTURA GRATUITA DE GOOGLE FIREBASE
-        // Para producción real, reemplaza estos datos con las llaves de tu Consola Firebase
+        // CONFIGURACIÓN DE TU INFRAESTRUCTURA REAL DE GOOGLE FIREBASE (ASOvo)
         const firebaseConfig = {
-            apiKey: "TU_API_KEY_AQUÍ",
-            authDomain: "TU_PROJECT_ID.firebaseapp.com",
-            projectId: "TU_PROJECT_ID",
-            storageBucket: "TU_PROJECT_ID.appspot.com",
-            messagingSenderId: "TU_MESSAGING_SENDER_ID",
-            appId: "TU_APP_ID"
+            apiKey: "AIzaSyBRwA284C8yCUttBJ7raEk4BTizxbVH4Cc",
+            authDomain: "asovo-7bb4f.firebaseapp.com",
+            projectId: "asovo-7bb4f",
+            storageBucket: "asovo-7bb4f.firebasestorage.app",
+            messagingSenderId: "145847950273",
+            appId: "1:145847950273:web:330b47716b3bd7c9ea2d40",
+            measurementId: "G-9CZF5YJ4RT"
         };
 
         // Estado e inicialización
         let app, auth, db, storage;
         let isFirebaseActive = false;
 
-        // Base de Datos local simulada (en memoria + localStorage) para que sea 100% funcional y testeable al abrir el archivo directamente
+        // Base de Datos local simulada (en memoria + localStorage) para respaldo
         let backupData = JSON.parse(localStorage.getItem('renacer_secure_data')) || [
             {
                 id: "doc-demo-secure",
@@ -249,6 +250,7 @@
         ];
 
         try {
+            // Como ya no dice "TU_API_KEY_AQUÍ", esto activará Firebase automáticamente
             if (firebaseConfig.apiKey !== "TU_API_KEY_AQUÍ") {
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
@@ -275,14 +277,12 @@
         // Manejador del botón principal de la barra de navegación
         btnAdminAction.addEventListener('click', () => {
             if (userSession) {
-                // Si ya está logueado, al dar clic cierra sesión
                 if (isFirebaseActive) {
                     signOut(auth);
                 } else {
                     handleLogoutState();
                 }
             } else {
-                // Si no está logueado, abre la pantalla privada de Login
                 publicFeedView.classList.add('hidden');
                 adminPanelView.classList.add('hidden');
                 loginView.classList.remove('hidden');
@@ -295,7 +295,7 @@
             if (userSession) adminPanelView.classList.remove('hidden');
         });
 
-        // --- MANEJO DE AUTENTICACIÓN (LOGIN REAL VS SIMULADO) ---
+        // --- MANEJO DE AUTENTICACIÓN ---
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
@@ -310,7 +310,6 @@
                     alert("Error de autenticación criptográfica: Verifique correo o clave.");
                 }
             } else {
-                // Simulación local sin internet: Clave por defecto para demostración de diseño
                 if (email === "admin@renacer.org" && pass === "Renacer2026") {
                     handleLoginState({ email });
                     loginView.classList.add('hidden');
@@ -341,7 +340,6 @@
             lucide.createIcons();
         }
 
-        // Monitoreo del estado de autenticación real de Firebase (si está activo)
         if (isFirebaseActive) {
             onAuthStateChanged(auth, (user) => {
                 if (user) {
@@ -375,12 +373,10 @@
 
             if (isFirebaseActive) {
                 try {
-                    // Carga aislada al Storage
                     const storageRef = ref(storage, `renacer_secure_pdfs/${Date.now()}_${file.name}`);
                     const uploadResult = await uploadBytes(storageRef, file);
                     const fileUrl = await getDownloadURL(uploadResult.ref);
 
-                    // Registro en base de datos NoSQL organizada cronológicamente
                     await addDoc(collection(db, "documents"), {
                         title,
                         desc,
@@ -396,7 +392,6 @@
                     alert("Error crítico en los servidores de almacenamiento.");
                 }
             } else {
-                // Flujo Local Simulado Autónomo
                 const fileReader = new FileReader();
                 fileReader.onload = function(event) {
                     const localEntry = {
@@ -455,7 +450,6 @@
                 });
 
                 card.innerHTML = `
-                    <!-- Fila Superior: Datos de Archivo -->
                     <div class="flex flex-col sm:flex-row justify-between items-start gap-4 pb-5 border-b border-slate-100">
                         <div class="space-y-1.5 max-w-3xl">
                             <div class="flex items-center gap-2">
@@ -472,7 +466,6 @@
                         </a>
                     </div>
 
-                    <!-- Módulo de Retroalimentación de la Comunidad (Comentarios) -->
                     <div class="space-y-3.5">
                         <h5 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
                             <i data-lucide="messages-square" class="w-3.5 h-3.5"></i> Interacciones Comunitarias (${currentComments.length})
@@ -482,7 +475,6 @@
                             ${commentsContainerHtml || '<p class="text-xs text-slate-400 italic pl-1">No se han registrado comentarios aún en este folio.</p>'}
                         </div>
 
-                        <!-- Panel de Inserción de Mensaje Directo -->
                         <div class="flex flex-col sm:flex-row gap-2 pt-2">
                             <input type="text" placeholder="Su Nombre" id="user-name-${item.id}" class="sm:w-1/4 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-800 transition">
                             <div class="flex-grow flex gap-2">
@@ -520,7 +512,6 @@
 
                     if (isFirebaseActive) {
                         try {
-                            // En Firebase Real real, actualizamos el array atómico de comentarios en Firestore
                             const docRef = doc(db, "documents", docId);
                             await updateDoc(docRef, {
                                 comments: arrayUnion(commentPayload)
@@ -529,7 +520,6 @@
                             console.error("Error guardando comentario:", err);
                         }
                     } else {
-                        // Flujo Simulado de Almacenamiento Local
                         const index = backupData.findIndex(d => d.id === docId);
                         if (index !== -1) {
                             if (!backupData[index].comments) backupData[index].comments = [];
@@ -553,12 +543,11 @@
                 renderSecureFeed(firebaseDocs);
             });
         } else {
-            // Inicialización con datos por defecto/locales si no hay Firebase configurado
             renderSecureFeed(backupData);
         }
 
         // Arranque estático de íconos vectoriales
         lucide.createIcons();
-    </script>
+</script>
 </body>
 </html>
