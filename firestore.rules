@@ -1,0 +1,38 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /documents/{docId} {
+
+      // Cualquier persona puede LEER los documentos (es un portal público).
+      allow read: if true;
+
+      // Solo un usuario autenticado (el admin con su cuenta de Firebase Auth)
+      // puede CREAR un nuevo documento, y debe traer la forma esperada.
+      allow create: if request.auth != null
+                    && request.resource.data.title is string
+                    && request.resource.data.title.size() > 0
+                    && request.resource.data.title.size() < 300
+                    && request.resource.data.desc is string
+                    && request.resource.data.desc.size() < 3000
+                    && request.resource.data.fileUrl is string
+                    && request.resource.data.timestamp is number;
+
+      // EDITAR el documento (título, descripción, archivo):
+      //   - El admin autenticado puede cambiar cualquier campo.
+      //   - Cualquier visitante (sin sesión) SOLO puede modificar el arreglo
+      //     "comments" agregando un comentario nuevo, sin tocar lo demás.
+      allow update: if (
+        request.auth != null
+      ) || (
+        request.auth == null &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['comments']) &&
+        request.resource.data.comments.size() == resource.data.comments.size() + 1
+      );
+
+      // Solo el admin autenticado puede ELIMINAR un documento.
+      allow delete: if request.auth != null;
+    }
+  }
+}

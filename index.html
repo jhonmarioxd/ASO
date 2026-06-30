@@ -355,16 +355,12 @@
                     loginView.classList.add('hidden');
                     publicFeedView.classList.remove('hidden');
                 } catch (err) {
-                    alert("Error de autenticación criptográfica: Verifique correo o clave.");
+                    alert("Error de autenticación: Verifique correo o clave.");
                 }
             } else {
-                if (email === "admin@renacer.org" && pass === "Renacer2026") {
-                    handleLoginState({ email });
-                    loginView.classList.add('hidden');
-                    publicFeedView.classList.remove('hidden');
-                } else {
-                    alert("Acceso Denegado: Credenciales inválidas para la Asociación.");
-                }
+                // Sin Firebase activo no existe autenticación real disponible.
+                // Por seguridad, NO se permite acceso de administrador en este modo.
+                alert("El acceso de administrador requiere conexión con Firebase. Verifique su configuración.");
             }
         });
 
